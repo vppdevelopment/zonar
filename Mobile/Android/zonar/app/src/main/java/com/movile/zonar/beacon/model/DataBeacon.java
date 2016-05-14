@@ -9,6 +9,9 @@ public class DataBeacon {
     private String name;
     private String beaconId;
 
+    public DataBeacon() {
+
+    }
     public DataBeacon(String beaconId, String name, String url) {
         this.url = url;
         this.name = name;

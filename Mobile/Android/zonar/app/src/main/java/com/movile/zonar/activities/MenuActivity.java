@@ -130,6 +130,14 @@ public class MenuActivity extends AppCompatActivity
         }
     }
 
+    private DataBeacon BuildDataBeacon(RemoteBluetoothDevice obj) {
+        DataBeacon beacon = new DataBeacon();
+        beacon.setBeaconId(obj.getUniqueId());
+
+        beacon.setName(obj.getName());
+        return beacon;
+    }
+
     @Override
     public void onScanStart() {
         Log.d(TAG, "scan started");
