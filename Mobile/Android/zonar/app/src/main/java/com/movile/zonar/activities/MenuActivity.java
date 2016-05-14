@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.widget.Toast;
 
 import com.kontakt.sdk.android.ble.connection.OnServiceReadyListener;
+import com.kontakt.sdk.android.ble.device.EddystoneDevice;
 import com.kontakt.sdk.android.ble.discovery.BluetoothDeviceEvent;
 import com.kontakt.sdk.android.ble.manager.ProximityManager;
 import com.kontakt.sdk.android.ble.manager.ProximityManagerContract;
@@ -132,6 +133,8 @@ public class MenuActivity extends AppCompatActivity
 
     private DataBeacon BuildDataBeacon(RemoteBluetoothDevice obj) {
         DataBeacon beacon = new DataBeacon();
+        EddystoneDevice data = (EddystoneDevice)obj;
+        beacon.setBeaconId(data.getUrl());
         beacon.setBeaconId(obj.getUniqueId());
 
         beacon.setName(obj.getName());
