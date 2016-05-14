@@ -13,8 +13,10 @@ import com.kontakt.sdk.android.ble.discovery.BluetoothDeviceEvent;
 import com.kontakt.sdk.android.ble.manager.ProximityManager;
 import com.kontakt.sdk.android.ble.manager.ProximityManagerContract;
 import com.kontakt.sdk.android.common.KontaktSDK;
+import com.kontakt.sdk.android.common.log.LogLevel;
 import com.kontakt.sdk.android.common.profile.RemoteBluetoothDevice;
 import com.kontakt.sdk.android.manager.KontaktProximityManager;
+import com.movile.zonar.BuildConfig;
 import com.movile.zonar.R;
 import com.movile.zonar.beacon.BeaconControl;
 import com.movile.zonar.beacon.ScanContext;
@@ -32,7 +34,7 @@ public class MenuActivity extends AppCompatActivity
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private static final String TAG = MenuActivity.class.getSimpleName();
     private ProximityManagerContract proximityManager;
-    private BeaconControl beaconControl = new BeaconControl();
+    private BeaconControl beaconControl;
     private List beaconsList = new ArrayList<DataBeacon>();
 
     @Override
@@ -41,9 +43,14 @@ public class MenuActivity extends AppCompatActivity
         setContentView(R.layout.activity_main_topdrawer);
         mToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(mToolbar);
+
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        KontaktSDK.initialize("api-key");
+
+        KontaktSDK.initialize("SCfoAPpNWQQBQGIpvLRciZNajCRjfeor").setDebugLoggingEnabled(BuildConfig.DEBUG)
+                .setLogLevelEnabled(LogLevel.DEBUG, true);
         proximityManager = new KontaktProximityManager(this);
+        beaconControl= new BeaconControl();
+
         mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.fragment_drawer);
         mNavigationDrawerFragment.setup(R.id.fragment_drawer, (DrawerLayout) findViewById(R.id.drawer), mToolbar);
     }
@@ -85,6 +92,7 @@ public class MenuActivity extends AppCompatActivity
     @Override
     public void onScanStop() {
 
+        Log.d(TAG, "scan stopped");
     }
 
     @Override
@@ -98,7 +106,7 @@ public class MenuActivity extends AppCompatActivity
                 for (RemoteBluetoothDevice obj : deviceList) {
                     String name = obj.getName();
                     Double distance = obj.getDistance();
-                    DataBeacon dataBeacon = beaconControl.getDataBeacon(obj.getUniqueId());
+                    DataBeacon dataBeacon = BuildDataBeacon(obj);
                     if (dataBeacon != null) {
                         this.beaconsList.add(dataBeacon);
                     }
@@ -124,7 +132,7 @@ public class MenuActivity extends AppCompatActivity
 
     @Override
     public void onScanStart() {
-
+        Log.d(TAG, "scan started");
     }
 
     @Override

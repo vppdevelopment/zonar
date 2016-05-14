@@ -3,6 +3,7 @@ package com.movile.zonar.integration;
 import android.util.Log;
 
 import com.kontakt.sdk.android.common.KontaktSDK;
+import com.kontakt.sdk.android.common.log.LogLevel;
 import com.kontakt.sdk.android.common.model.Beacon;
 import com.kontakt.sdk.android.common.model.IDevice;
 import com.kontakt.sdk.android.http.HttpResult;
@@ -10,6 +11,7 @@ import com.kontakt.sdk.android.http.KontaktApiClient;
 import com.kontakt.sdk.android.http.RequestDescription;
 import com.kontakt.sdk.android.http.exception.ClientException;
 import com.kontakt.sdk.android.http.interfaces.ResultApiCallback;
+import com.movile.zonar.BuildConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,16 +25,12 @@ public class KontaktIntegratorImpl implements KontaktIntegrator {
     private List<IDevice> allDevices;
     private Beacon beacon;
 
-    public void configureParameters() {
-        KontaktSDK.initialize("SCfoAPpNWQQBQGIpvLRciZNajCRjfeor");
-
+    public KontaktIntegratorImpl() {
         kontaktApiClient = new KontaktApiClient();
-
     }
 
     @Override
     public List<IDevice> getDevices(int offset) {
-        configureParameters();
         allDevices = new ArrayList<>();
         fetchDevices(offset);
         return allDevices;
@@ -40,7 +38,6 @@ public class KontaktIntegratorImpl implements KontaktIntegrator {
 
     @Override
     public Beacon getDevice(String deviceId) {
-        configureParameters();
         fetchDevice(deviceId);
         Beacon beacon = this.beacon;
         return beacon;

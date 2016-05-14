@@ -28,7 +28,6 @@ public class ScanContext {
                     .setScanMode(ProximityManager.SCAN_MODE_BALANCED)
                     .setActivityCheckConfiguration(ActivityCheckConfiguration.MINIMAL)
                     .setForceScanConfiguration(ForceScanConfiguration.MINIMAL)
-                    .setIBeaconScanContext(new IBeaconScanContext.Builder().build())
                     .setEddystoneScanContext(new EddystoneScanContext.Builder().build())
                     .setForceScanConfiguration(ForceScanConfiguration.MINIMAL)
                     .build();
