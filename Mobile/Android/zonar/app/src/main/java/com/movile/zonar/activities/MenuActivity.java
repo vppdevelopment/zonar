@@ -1,5 +1,6 @@
 package com.movile.zonar.activities;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.Toast;
+
 
 import com.kontakt.sdk.android.ble.connection.OnServiceReadyListener;
 import com.kontakt.sdk.android.ble.device.EddystoneDevice;
@@ -50,10 +52,11 @@ public class MenuActivity extends AppCompatActivity
         KontaktSDK.initialize("SCfoAPpNWQQBQGIpvLRciZNajCRjfeor").setDebugLoggingEnabled(BuildConfig.DEBUG)
                 .setLogLevelEnabled(LogLevel.DEBUG, true);
         proximityManager = new KontaktProximityManager(this);
-        beaconControl= new BeaconControl();
+        beaconControl = new BeaconControl();
 
         mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.fragment_drawer);
         mNavigationDrawerFragment.setup(R.id.fragment_drawer, (DrawerLayout) findViewById(R.id.drawer), mToolbar);
+
     }
 
     @Override
@@ -78,15 +81,18 @@ public class MenuActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
+
         proximityManager.initializeScan(ScanContext.getScannerContext(), new OnServiceReadyListener() {
             @Override
             public void onServiceReady() {
                 proximityManager.attachListener(MenuActivity.this);
             }
+
             @Override
             public void onConnectionFailure() {
             }
         });
+
     }
 
 
@@ -109,10 +115,11 @@ public class MenuActivity extends AppCompatActivity
                     Double distance = obj.getDistance();
                     DataBeacon dataBeacon = BuildDataBeacon(obj);
                     if (dataBeacon != null) {
+                        if(!ExistBeacon(dataBeacon))
                         this.beaconsList.add(dataBeacon);
                     }
                 }
-                for(Object valor: beaconsList){
+                for (Object valor : beaconsList) {
                     Log.d(TAG, "found new beacon");
                     Log.d(TAG, valor.toString());
                 }
@@ -131,13 +138,29 @@ public class MenuActivity extends AppCompatActivity
         }
     }
 
-    private DataBeacon BuildDataBeacon(RemoteBluetoothDevice obj) {
-        DataBeacon beacon = new DataBeacon();
-        EddystoneDevice data = (EddystoneDevice)obj;
-        beacon.setBeaconId(data.getUrl());
-        beacon.setBeaconId(obj.getUniqueId());
+    private boolean ExistBeacon(DataBeacon dataBeacon) {
 
-        beacon.setName(obj.getName());
+        boolean exist = false;
+
+        for (Object b : this.beaconsList){
+            DataBeacon data = (DataBeacon)b;
+            if(dataBeacon.getUrl().equals(data.getUrl()))
+             exist=true;
+        }
+        return exist;
+    }
+
+    private DataBeacon BuildDataBeacon(RemoteBluetoothDevice obj) {
+        DataBeacon beacon = null;
+        EddystoneDevice data = (EddystoneDevice) obj;
+        String url = data.getUrl();
+
+        if (url != null) {
+            beacon = new DataBeacon();
+            beacon.setBeaconId(obj.getUniqueId());
+            beacon.setUrl(url);
+            beacon.setName(obj.getName());
+        }
         return beacon;
     }
 
@@ -149,7 +172,9 @@ public class MenuActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
+
         proximityManager.detachListener(this);
         proximityManager.disconnect();
+
     }
 }
