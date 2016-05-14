@@ -156,7 +156,7 @@ public class MenuActivity extends AppCompatActivity
         String url = data.getUrl();
 
         if (url != null) {
-            beacon = new DataBeacon();
+            beacon = new DataBeacon("","","");
             beacon.setBeaconId(obj.getUniqueId());
             beacon.setUrl(url);
             beacon.setName(obj.getName());

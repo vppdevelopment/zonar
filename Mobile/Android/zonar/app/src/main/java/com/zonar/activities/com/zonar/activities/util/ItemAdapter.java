@@ -14,8 +14,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.zonar.activities.R;
-import com.zonar.beacon.com.zonar.beacon.model.DataBeacon;
+import com.movile.zonar.R;
+import com.movile.zonar.beacon.model.DataBeacon;
 
 public class ItemAdapter extends BaseAdapter {
 
