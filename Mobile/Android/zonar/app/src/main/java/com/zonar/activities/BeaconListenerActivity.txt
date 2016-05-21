@@ -19,7 +19,7 @@ import com.kontakt.sdk.android.common.KontaktSDK;
 import com.kontakt.sdk.android.common.profile.DeviceProfile;
 import com.kontakt.sdk.android.common.profile.RemoteBluetoothDevice;
 import com.kontakt.sdk.android.manager.KontaktProximityManager;
-import com.zonar.activities.com.zonar.activities.util.ItemAdapter;
+import com.movile.zonar.activities.ItemAdapter;
 import com.zonar.beacon.BeaconControl;
 import com.zonar.beacon.com.zonar.beacon.model.DataBeacon;
 

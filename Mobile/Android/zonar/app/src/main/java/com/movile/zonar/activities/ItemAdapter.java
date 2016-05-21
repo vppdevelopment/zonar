@@ -1,4 +1,4 @@
-package com.zonar.activities.com.zonar.activities.util;
+package com.movile.zonar.activities;
 
 /**
  * Created by Liliana on 30/04/2016.

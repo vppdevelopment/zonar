@@ -1,5 +1,6 @@
 package com.movile.zonar.activities;
 
+import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -7,6 +8,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 
@@ -37,8 +43,13 @@ public class MenuActivity extends AppCompatActivity
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private static final String TAG = MenuActivity.class.getSimpleName();
     private ProximityManagerContract proximityManager;
-    private BeaconControl beaconControl;
+    private ScanContext scanContext;
+
     private List beaconsList = new ArrayList<DataBeacon>();
+    private ListView listView;
+    private WebView webView;
+    private ProgressDialog progressDialog;
+    ItemAdapter itemAdapter ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,14 +60,20 @@ public class MenuActivity extends AppCompatActivity
 
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        KontaktSDK.initialize("SCfoAPpNWQQBQGIpvLRciZNajCRjfeor").setDebugLoggingEnabled(BuildConfig.DEBUG)
-                .setLogLevelEnabled(LogLevel.DEBUG, true);
+        KontaktSDK.initialize("SCfoAPpNWQQBQGIpvLRciZNajCRjfeor").setDebugLoggingEnabled(BuildConfig.DEBUG).setLogLevelEnabled(LogLevel.DEBUG, true);
         proximityManager = new KontaktProximityManager(this);
-        beaconControl = new BeaconControl();
+        this.listView = (ListView) findViewById(R.id.listView);
+        beaconsList = new ArrayList<DataBeacon>();
+        //beaconsList.add(new DataBeacon("A", "Following", "http://www.imdb.com/title/tt0154506/"));
+        itemAdapter = (new ItemAdapter(this, this.beaconsList));
+        this.listView.setAdapter(itemAdapter);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.fragment_drawer);
         mNavigationDrawerFragment.setup(R.id.fragment_drawer, (DrawerLayout) findViewById(R.id.drawer), mToolbar);
 
+
+
+        //itemAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -95,46 +112,50 @@ public class MenuActivity extends AppCompatActivity
 
     }
 
-
     @Override
     public void onScanStop() {
-
         Log.d(TAG, "scan stopped");
+    }
+
+    private com.kontakt.sdk.android.ble.configuration.scan.ScanContext getScanContext() {
+        return ScanContext.getScannerContext();
     }
 
     @Override
     public void onEvent(BluetoothDeviceEvent bluetoothDeviceEvent) {
-        List<? extends RemoteBluetoothDevice> deviceList = bluetoothDeviceEvent.getDeviceList();
 
-        switch (bluetoothDeviceEvent.getEventType()) {
-            case SPACE_ENTERED:
-                break;
-            case DEVICE_DISCOVERED:
-                for (RemoteBluetoothDevice obj : deviceList) {
-                    String name = obj.getName();
-                    Double distance = obj.getDistance();
-                    DataBeacon dataBeacon = BuildDataBeacon(obj);
-                    if (dataBeacon != null) {
-                        if(!ExistBeacon(dataBeacon))
-                        this.beaconsList.add(dataBeacon);
+        synchronized(itemAdapter) {
+
+            List<? extends RemoteBluetoothDevice> deviceList = bluetoothDeviceEvent.getDeviceList();
+            switch (bluetoothDeviceEvent.getEventType()) {
+                case SPACE_ENTERED:
+                    break;
+                case DEVICE_DISCOVERED:
+                    for (RemoteBluetoothDevice obj : deviceList) {
+                        String name = obj.getName();
+                        Double distance = obj.getDistance();
+                        DataBeacon dataBeacon = BuildDataBeacon(obj);
+                        if (dataBeacon != null) {
+                            if (!ExistBeacon(dataBeacon)) {
+                                Log.d(TAG, dataBeacon.toString());
+                                this.beaconsList.add(dataBeacon);
+                                this.itemAdapter.notifyDataSetChanged();
+                            }
+                        }
                     }
-                }
-                for (Object valor : beaconsList) {
-                    Log.d(TAG, "found new beacon");
-                    Log.d(TAG, valor.toString());
-                }
 
-                break;
-            case DEVICES_UPDATE:
-                //Log.d(TAG, "updated beacons");
-                break;
-            case DEVICE_LOST:
+                    break;
+                case DEVICES_UPDATE:
+                    //Log.d(TAG, "updated beacons");
+                    break;
+                case DEVICE_LOST:
 
-                // Log.d(TAG, "lost device");
-                break;
-            case SPACE_ABANDONED:
-                //Log.d(TAG, "namespace or region abandoned");
-                break;
+                    // Log.d(TAG, "lost device");
+                    break;
+                case SPACE_ABANDONED:
+                    //Log.d(TAG, "namespace or region abandoned");
+                    break;
+            }
         }
     }
 
@@ -176,5 +197,25 @@ public class MenuActivity extends AppCompatActivity
         proximityManager.detachListener(this);
         proximityManager.disconnect();
 
+    }
+
+    private class myWebClient extends WebViewClient {
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            // Load the given URL on our WebView.
+            view.loadUrl(url);
+            return true;
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+
+            // When the page has finished loading, hide progress dialog and
+            // progress bar in the title.
+            super.onPageFinished(view, url);
+            setProgressBarIndeterminateVisibility(false);
+            progressDialog.dismiss();
+        }
     }
 }
