@@ -15,7 +15,7 @@ public class DataBeacon {
 
     public DataBeacon(String beaconId, String name, String url) {
         this.image = R.mipmap.prueba;
-        this.url = url;
+        this.url = "www.google.com";
         this.name = name;
         this.beaconId = beaconId;
     }

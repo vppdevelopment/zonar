@@ -1,4 +1,6 @@
 package com.zonar.activities;
+
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -27,6 +29,7 @@ import com.kontakt.sdk.android.common.profile.RemoteBluetoothDevice;
 import com.kontakt.sdk.android.manager.KontaktProximityManager;
 import com.zonar.activities.com.zonar.activities.util.ItemAdapter;
 import com.zonar.beacon.com.zonar.beacon.model.DataBeacon;
+import com.zonar.com.zonar.dialogs.Navigator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,40 +38,46 @@ import java.util.concurrent.TimeUnit;
 public class BeaconListenerActivity extends AppCompatActivity implements ProximityManager.ProximityListener {
 
 
-    private static final String TAG ="POLO";
+    private static final String TAG = "POLO";
+
 
     private ProximityManagerContract proximityManager;
     private ScanContext scanContext;
     private static List beaconsList = new ArrayList<DataBeacon>();
     private ListView listView;
     private WebView webView;
-    private ProgressDialog progressDialog;
-    static ItemAdapter itemAdapter ;
+    public ProgressDialog progressDialog;
+    static ItemAdapter itemAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_beacon_listener);
         KontaktSDK.initialize("api-key");
         proximityManager = new KontaktProximityManager(this);
-
+        //final WebView myWebView = (WebView) this.findViewById(R.id.webViews);
         this.listView = (ListView) findViewById(R.id.listView);
         itemAdapter = (new ItemAdapter(this, this.beaconsList));
         this.listView.setAdapter(itemAdapter);
+     //   this.webView = (WebView) findViewById(R.id.webView);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapter, View view,
                                     int position, long arg) {
+                setProgressBarIndeterminateVisibility(true);
 
-
+                progressDialog = ProgressDialog.show(BeaconListenerActivity.this,
+                        "ProgressDialog", "Loading!");
+                Navigator navigatorDialog = new Navigator();
+                navigatorDialog.setActivity(BeaconListenerActivity.this);
+                navigatorDialog.show(getFragmentManager(),"Navigator");
+                //dlg2.getShowsDialog();
                 // Loads the given URL
-                DataBeacon item = (DataBeacon)
+               // DataBeacon item = (DataBeacon) listView.getAdapter().getItem(position);
+              //  webView.loadUrl(item.getUrl());
+               // Intent intent = new Intent(Intent.ACTION_VIEW);
 
-                        listView.getAdapter().getItem(position);
-                webView.loadUrl(item.getUrl());
-
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse(item.getUrl()));
-                startActivity(intent);
+               // myWebView.loadUrl(item.getUrl());
             }
         });
     }
@@ -102,7 +111,7 @@ public class BeaconListenerActivity extends AppCompatActivity implements Proximi
 
     @Override
     public void onEvent(BluetoothDeviceEvent bluetoothDeviceEvent) {
-        synchronized(itemAdapter) {
+        synchronized (itemAdapter) {
 
             List<? extends RemoteBluetoothDevice> deviceList = bluetoothDeviceEvent.getDeviceList();
             switch (bluetoothDeviceEvent.getEventType()) {
@@ -118,14 +127,14 @@ public class BeaconListenerActivity extends AppCompatActivity implements Proximi
                         String beaconId = obj.getUniqueId();
                         DataBeacon dataBeacon = new DataBeacon(beaconId, "Aqui va nombre", sss.getUrl());
 
-                        if(dataBeacon.getUrl() != null && !this.beaconsList.contains(dataBeacon) ) {
+                        if (dataBeacon.getUrl() != null && !this.beaconsList.contains(dataBeacon)) {
                             Log.d(TAG, dataBeacon.toString());
                             this.beaconsList.add(dataBeacon);
                             this.itemAdapter.notifyDataSetChanged();
                         }
 
-                        if(dataBeacon.getUrl() == null){
-                            Log.e(TAG, "BEACON NULO > "+dataBeacon.toString());
+                        if (dataBeacon.getUrl() == null) {
+                            Log.e(TAG, "BEACON NULO > " + dataBeacon.toString());
                         }
                     }
                     break;
@@ -152,23 +161,5 @@ public class BeaconListenerActivity extends AppCompatActivity implements Proximi
         Log.e(TAG, "scan stopped");
     }
 
-    private class myWebClient extends WebViewClient {
 
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            // Load the given URL on our WebView.
-            view.loadUrl(url);
-            return true;
-        }
-
-        @Override
-        public void onPageFinished(WebView view, String url) {
-
-            // When the page has finished loading, hide progress dialog and
-            // progress bar in the title.
-            super.onPageFinished(view, url);
-            setProgressBarIndeterminateVisibility(false);
-            progressDialog.dismiss();
-        }
-    }
 }
