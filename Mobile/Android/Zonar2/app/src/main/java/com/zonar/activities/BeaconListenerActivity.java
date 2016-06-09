@@ -60,6 +60,13 @@ public class BeaconListenerActivity extends AppCompatActivity implements Proximi
         itemAdapter = (new ItemAdapter(this, this.beaconsList));
         this.listView.setAdapter(itemAdapter);
      //   this.webView = (WebView) findViewById(R.id.webView);
+        DataBeacon dataBeacon = new DataBeacon("ASD54","a", "https://www.google.com.co");
+        this.beaconsList.add(dataBeacon);
+        DataBeacon dataBeacon1 = new DataBeacon("POLIOJ5","a", "https://www.google.com.co");
+        this.beaconsList.add(dataBeacon1);
+        DataBeacon dataBeacon2 = new DataBeacon("65HUNG","a", "https://www.google.com.co");
+        this.beaconsList.add(dataBeacon2);
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapter, View view,
