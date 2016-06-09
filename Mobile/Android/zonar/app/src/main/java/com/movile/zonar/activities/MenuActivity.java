@@ -30,6 +30,7 @@ import com.movile.zonar.R;
 import com.movile.zonar.beacon.BeaconControl;
 import com.movile.zonar.beacon.ScanContext;
 import com.movile.zonar.beacon.model.DataBeacon;
+import com.movile.zonar.dialog.Navigator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +49,7 @@ public class MenuActivity extends AppCompatActivity
     private List beaconsList = new ArrayList<DataBeacon>();
     private ListView listView;
     private WebView webView;
-    private ProgressDialog progressDialog;
+    public ProgressDialog progressDialog;
     ItemAdapter itemAdapter ;
 
     @Override
@@ -71,7 +72,26 @@ public class MenuActivity extends AppCompatActivity
         mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.fragment_drawer);
         mNavigationDrawerFragment.setup(R.id.fragment_drawer, (DrawerLayout) findViewById(R.id.drawer), mToolbar);
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapter, View view,
+                                    int position, long arg) {
+                setProgressBarIndeterminateVisibility(true);
 
+                progressDialog = ProgressDialog.show(MenuActivity.this,
+                        "ProgressDialog", "Loading!");
+                Navigator navigatorDialog = new Navigator();
+                navigatorDialog.setActivity(MenuActivity.this);
+                navigatorDialog.show(getFragmentManager(),"Navigator");
+                //dlg2.getShowsDialog();
+                // Loads the given URL
+                // DataBeacon item = (DataBeacon) listView.getAdapter().getItem(position);
+                //  webView.loadUrl(item.getUrl());
+                // Intent intent = new Intent(Intent.ACTION_VIEW);
+
+                // myWebView.loadUrl(item.getUrl());
+            }
+        });
 
         //itemAdapter.notifyDataSetChanged();
     }
