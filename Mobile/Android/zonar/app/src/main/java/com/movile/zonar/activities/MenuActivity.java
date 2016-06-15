@@ -31,6 +31,9 @@ import com.movile.zonar.beacon.BeaconControl;
 import com.movile.zonar.beacon.ScanContext;
 import com.movile.zonar.beacon.model.DataBeacon;
 import com.movile.zonar.dialog.Navigator;
+import com.movile.zonar.integration.ApiCoreIntegrator;
+import com.movile.zonar.integration.ApiCoreIntegratorImpl;
+import com.movile.zonar.service.BeaconListService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +53,8 @@ public class MenuActivity extends AppCompatActivity
     private ListView listView;
     private WebView webView;
     public ProgressDialog progressDialog;
-    ItemAdapter itemAdapter ;
-
+    ItemAdapter itemAdapter;
+private BeaconListService beaconListService = new BeaconListService();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +85,7 @@ public class MenuActivity extends AppCompatActivity
                         "ProgressDialog", "Loading!");
                 Navigator navigatorDialog = new Navigator();
                 navigatorDialog.setActivity(MenuActivity.this);
-                navigatorDialog.show(getFragmentManager(),"Navigator");
+                navigatorDialog.show(getFragmentManager(), "Navigator");
                 //dlg2.getShowsDialog();
                 // Loads the given URL
                 // DataBeacon item = (DataBeacon) listView.getAdapter().getItem(position);
@@ -144,7 +147,7 @@ public class MenuActivity extends AppCompatActivity
     @Override
     public void onEvent(BluetoothDeviceEvent bluetoothDeviceEvent) {
 
-        synchronized(itemAdapter) {
+        synchronized (itemAdapter) {
 
             List<? extends RemoteBluetoothDevice> deviceList = bluetoothDeviceEvent.getDeviceList();
             switch (bluetoothDeviceEvent.getEventType()) {
@@ -157,7 +160,10 @@ public class MenuActivity extends AppCompatActivity
                         DataBeacon dataBeacon = BuildDataBeacon(obj);
                         if (dataBeacon != null) {
                             if (!ExistBeacon(dataBeacon)) {
+
+                                beaconListService.getBeaconContent();
                                 Log.d(TAG, dataBeacon.toString());
+
                                 this.beaconsList.add(dataBeacon);
                                 this.itemAdapter.notifyDataSetChanged();
                             }
@@ -183,10 +189,10 @@ public class MenuActivity extends AppCompatActivity
 
         boolean exist = false;
 
-        for (Object b : this.beaconsList){
-            DataBeacon data = (DataBeacon)b;
-            if(dataBeacon.getUrl().equals(data.getUrl()))
-             exist=true;
+        for (Object b : this.beaconsList) {
+            DataBeacon data = (DataBeacon) b;
+            if (dataBeacon.getUrl().equals(data.getUrl()))
+                exist = true;
         }
         return exist;
     }
@@ -197,7 +203,7 @@ public class MenuActivity extends AppCompatActivity
         String url = data.getUrl();
 
         if (url != null) {
-            beacon = new DataBeacon("","","");
+            beacon = new DataBeacon("", "", "");
             beacon.setBeaconId(obj.getUniqueId());
             beacon.setUrl(url);
             beacon.setName(obj.getName());

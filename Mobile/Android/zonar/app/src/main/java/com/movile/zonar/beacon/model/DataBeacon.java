@@ -4,11 +4,13 @@ import com.movile.zonar.R;
 
 /**
  * Created by Liliana on 28/04/2016.
- */public class DataBeacon {
+ */
+public class DataBeacon {
     private int image;
     private String url;
     private String name;
     private String beaconId;
+
 
     public DataBeacon(String beaconId, String name, String url) {
         this.image = R.mipmap.ic_launcher;
@@ -49,6 +51,8 @@ import com.movile.zonar.R;
         this.image = image;
     }
 
+
+
     @Override
     public String toString() {
         StringBuilder sbDataBeacon = new StringBuilder();
@@ -60,8 +64,11 @@ import com.movile.zonar.R;
         sbDataBeacon.append(url);
         return sbDataBeacon.toString();
     }
+
     @Override
     public boolean equals(Object o) {
-        return this.getBeaconId().equals(((DataBeacon)o).getBeaconId());
+        return this.getBeaconId().equals(((DataBeacon) o).getBeaconId());
     }
+
+
 }
