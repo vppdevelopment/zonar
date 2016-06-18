@@ -8,14 +8,11 @@ import com.movile.zonar.R;
 public class DataBeacon {
     private int image;
     private String url;
-    private String name;
     private String beaconId;
 
 
-    public DataBeacon(String beaconId, String name, String url) {
+    public DataBeacon(String beaconId) {
         this.image = R.mipmap.ic_launcher;
-        this.url = url;
-        this.name = name;
         this.beaconId = beaconId;
     }
 
@@ -25,14 +22,6 @@ public class DataBeacon {
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getBeaconId() {
@@ -56,8 +45,6 @@ public class DataBeacon {
     @Override
     public String toString() {
         StringBuilder sbDataBeacon = new StringBuilder();
-        sbDataBeacon.append("NAME ");
-        sbDataBeacon.append(name);
         sbDataBeacon.append("UNIQUE ID ");
         sbDataBeacon.append(beaconId);
         sbDataBeacon.append("URL ");

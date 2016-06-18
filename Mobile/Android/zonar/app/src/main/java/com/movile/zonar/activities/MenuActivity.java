@@ -42,7 +42,7 @@ import java.util.List;
 public class MenuActivity extends AppCompatActivity
         implements NavigationDrawerCallbacks,
         ProximityManager.ProximityListener {
-
+    private  String CORE_API_URL;
     private Toolbar mToolbar;
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private static final String TAG = MenuActivity.class.getSimpleName();
@@ -54,11 +54,13 @@ public class MenuActivity extends AppCompatActivity
     private WebView webView;
     public ProgressDialog progressDialog;
     ItemAdapter itemAdapter;
-private BeaconListService beaconListService = new BeaconListService();
+
+    private BeaconListService beaconListService = new BeaconListService();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_topdrawer);
+        CORE_API_URL = getResources().getString(R.string.core_url);
         mToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(mToolbar);
 
@@ -79,16 +81,17 @@ private BeaconListService beaconListService = new BeaconListService();
             @Override
             public void onItemClick(AdapterView<?> adapter, View view,
                                     int position, long arg) {
+                DataBeacon item = (DataBeacon) listView.getAdapter().getItem(position);
                 setProgressBarIndeterminateVisibility(true);
-
                 progressDialog = ProgressDialog.show(MenuActivity.this,
                         "ProgressDialog", "Loading!");
                 Navigator navigatorDialog = new Navigator();
+                navigatorDialog.setUrl(item.getUrl());
+
                 navigatorDialog.setActivity(MenuActivity.this);
                 navigatorDialog.show(getFragmentManager(), "Navigator");
                 //dlg2.getShowsDialog();
                 // Loads the given URL
-                // DataBeacon item = (DataBeacon) listView.getAdapter().getItem(position);
                 //  webView.loadUrl(item.getUrl());
                 // Intent intent = new Intent(Intent.ACTION_VIEW);
 
@@ -155,15 +158,11 @@ private BeaconListService beaconListService = new BeaconListService();
                     break;
                 case DEVICE_DISCOVERED:
                     for (RemoteBluetoothDevice obj : deviceList) {
-                        String name = obj.getName();
-                        Double distance = obj.getDistance();
                         DataBeacon dataBeacon = BuildDataBeacon(obj);
                         if (dataBeacon != null) {
-                            if (!ExistBeacon(dataBeacon)) {
-
-                                beaconListService.getBeaconContent();
+                            if (!this.beaconsList.contains(dataBeacon)) {
+                                beaconListService.getBeaconContent(CORE_API_URL,dataBeacon);
                                 Log.d(TAG, dataBeacon.toString());
-
                                 this.beaconsList.add(dataBeacon);
                                 this.itemAdapter.notifyDataSetChanged();
                             }
@@ -185,28 +184,11 @@ private BeaconListService beaconListService = new BeaconListService();
         }
     }
 
-    private boolean ExistBeacon(DataBeacon dataBeacon) {
-
-        boolean exist = false;
-
-        for (Object b : this.beaconsList) {
-            DataBeacon data = (DataBeacon) b;
-            if (dataBeacon.getUrl().equals(data.getUrl()))
-                exist = true;
-        }
-        return exist;
-    }
-
     private DataBeacon BuildDataBeacon(RemoteBluetoothDevice obj) {
-        DataBeacon beacon = null;
         EddystoneDevice data = (EddystoneDevice) obj;
-        String url = data.getUrl();
-
-        if (url != null) {
-            beacon = new DataBeacon("", "", "");
-            beacon.setBeaconId(obj.getUniqueId());
-            beacon.setUrl(url);
-            beacon.setName(obj.getName());
+        DataBeacon beacon = null;
+        if (obj.getUniqueId() != null) {
+            beacon = new DataBeacon(obj.getUniqueId());
         }
         return beacon;
     }

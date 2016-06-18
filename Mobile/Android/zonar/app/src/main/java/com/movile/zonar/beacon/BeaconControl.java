@@ -20,8 +20,7 @@ public class BeaconControl {
         Beacon beacon = kontaktIntegrator.getDevice(beaconId);
         DataBeacon dataBeacon = null;
         if (beacon != null) {
-            dataBeacon = new DataBeacon(beacon.getUniqueId(), beacon.getName(), beacon.getUrl());
-
+            dataBeacon = new DataBeacon(beacon.getUniqueId());
         }
         return dataBeacon;
     }

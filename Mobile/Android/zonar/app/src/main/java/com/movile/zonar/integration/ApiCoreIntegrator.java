@@ -7,6 +7,6 @@ import java.util.Map;
  */
 public interface ApiCoreIntegrator {
 
-   public String get(String url, Map<String, String> parameters, Map<String, Object> headers);
+   public String get(String url, Map<String, String> parameters);
 
 }
