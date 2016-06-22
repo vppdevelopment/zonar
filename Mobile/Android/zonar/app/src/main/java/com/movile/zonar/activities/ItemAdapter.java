@@ -59,7 +59,6 @@ public class ItemAdapter extends BaseAdapter {
         TextView tvTitle = (TextView) rowView.findViewById(R.id.tvTitle);
 
         DataBeacon item = this.items.get(position);
-        tvTitle.setText(item.getName());
         ivItem.setImageResource(item.getImage());
 
         return rowView;
