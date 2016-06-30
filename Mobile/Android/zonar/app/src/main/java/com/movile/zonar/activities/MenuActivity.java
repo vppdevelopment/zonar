@@ -2,6 +2,7 @@ package com.movile.zonar.activities;
 
 import android.app.ProgressDialog;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -45,7 +46,7 @@ public class MenuActivity extends AppCompatActivity
     private  String CORE_API_URL;
     private Toolbar mToolbar;
     private NavigationDrawerFragment mNavigationDrawerFragment;
-    private static final String TAG = MenuActivity.class.getSimpleName();
+    private static final String TAG = "POLO";
     private ProximityManagerContract proximityManager;
     private ScanContext scanContext;
 
@@ -161,10 +162,9 @@ public class MenuActivity extends AppCompatActivity
                         DataBeacon dataBeacon = BuildDataBeacon(obj);
                         if (dataBeacon != null) {
                             if (!this.beaconsList.contains(dataBeacon)) {
-                                beaconListService.getBeaconContent(CORE_API_URL,dataBeacon);
-                                Log.d(TAG, dataBeacon.toString());
-                                this.beaconsList.add(dataBeacon);
-                                this.itemAdapter.notifyDataSetChanged();
+                                LongRunningGetIO backgroundProcess = new LongRunningGetIO();
+                                backgroundProcess.setDataBeacon(dataBeacon);
+                                 backgroundProcess.execute();
                             }
                         }
                     }
@@ -226,4 +226,40 @@ public class MenuActivity extends AppCompatActivity
             progressDialog.dismiss();
         }
     }
+
+
+
+    private class LongRunningGetIO extends AsyncTask<Void, Void, String> {
+private DataBeacon dataBeacon = null;
+
+
+
+        @Override
+        protected String doInBackground(Void... params) {
+            if(dataBeacon != null) {
+                beaconListService.getBeaconContent(CORE_API_URL, dataBeacon);
+                return dataBeacon.getUrl();
+            }
+            return null;
+        }
+
+
+        protected void onPostExecute(String results) {
+            if(dataBeacon != null){
+                Log.d(TAG, dataBeacon.toString());
+                beaconsList.add(dataBeacon);
+                itemAdapter.notifyDataSetChanged();
+            }
+        }
+
+        public DataBeacon getDataBeacon() {
+            return dataBeacon;
+        }
+
+        public void setDataBeacon(DataBeacon dataBeacon) {
+            this.dataBeacon = dataBeacon;
+        }
+    }
+
+
 }

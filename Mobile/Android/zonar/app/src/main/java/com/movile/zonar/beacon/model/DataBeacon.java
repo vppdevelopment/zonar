@@ -11,7 +11,7 @@ public class DataBeacon {
     private String beaconId;
 
 
-    public DataBeacon(String beaconId) {
+       public DataBeacon(String beaconId) {
         this.image = R.mipmap.ic_launcher;
         this.beaconId = beaconId;
     }
